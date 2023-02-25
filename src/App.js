@@ -7,21 +7,21 @@ import './App.css';
 
 const ROBOT_AVATAR = "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg2.doubanio.com%2Fview%2Frichtext%2Flarge%2Fpublic%2Fp53389253.jpg&refer=http%3A%2F%2Fimg2.doubanio.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1679757641&t=a44588a81d7efe7dc16416d4b89059eb";
 const USER_AVATAR = "https://ts1.cn.mm.bing.net/th/id/R-C.0a1f275d1d27d96f996ae5af9cc838eb?rik=ifvouAHyyFj8cg&riu=http%3a%2f%2fwww.yulumi.cn%2fgl%2fuploads%2fallimg%2f201204%2f3-20120415332MI.jpg&ehk=FWvR8lLqblGnk%2bLTcv7CSk8AlAh1U5CdHJDAoHY45rc%3d&risl=&pid=ImgRaw&r=0";
-const baseUrl = "http://119.23.44.144:8080/"
+const baseUrl = "https://platypus.yazuishoudalu.com/"
 export const API = axios.create({
-    baseURL: baseUrl,
+  baseURL: baseUrl,
 });
 
 const mockMessage = [{
-    sender: 0,
-    message: '你好，我是钛月ai助手，欢迎使用聊天室，请问我一个问题吧'
-  }
+  sender: 0,
+  message: '你好，我是钛月ai助手，欢迎使用聊天室，请问我一个问题吧'
+}
 ]
 
 function App() {
   const [messageList, setMessageList] = useState(mockMessage);
   const [inputText, setInputText] = useState('');
-  const [userId, setUserId] = useState('oVa5_5_3o9WK2x3e_jIOe3pMz7Bc');
+  const [userId, setUserId] = useState('');
   const [balance, setBalance] = useState();
 
   const scrollToBottom = () => {
@@ -31,7 +31,7 @@ function App() {
     }
   }
 
-  useEffect(()=> {
+  useEffect(() => {
     const params = window.location.search?.split('?')[1]?.split('&');
     const found = params?.find(param => param.includes('code='));
     if (found) {
@@ -47,14 +47,14 @@ function App() {
       const data = response?.data?.data
       if (data?.wx_id) {
         setUserId(data.wx_id);
-      } 
+      }
       if (data?.quota) {
         setBalance(data.quota);
       }
     }).catch(r => console.log(r))
   }
 
-  useEffect(()=> {
+  useEffect(() => {
     scrollToBottom();
   }, [messageList]);
 
@@ -93,24 +93,26 @@ function App() {
 
   return (
     <div className="chat-room">
+      {userId !== "" && <div className='user-id'>userid: {userId}</div>}
       <div className='message-part'>
         {
-          messageList.map(item => 
+          messageList.map(item =>
             <MessageBox sender={item.sender} message={item.message}></MessageBox>
           )
         }
       </div>
       <div className='typing-part'>
-        <div>
+        <div className="">
           <Button className='charge-button' disabled>充值</Button>
           <Button className='charge-button' disabled>历史对话</Button>
           <div className='balance'>余额: 还有{balance}次提问</div>
+
         </div>
         <div className='typing-line'>
-          <Input 
-            placeholder='请输入' 
-            value={inputText} 
-            onChange={(v)=> setInputText(v.target.value)} 
+          <Input
+            placeholder='请输入'
+            value={inputText}
+            onChange={(v) => setInputText(v.target.value)}
             onPressEnter={() => sendMessage(inputText)}></Input>
           <Button className='sent-button' type='primary' onClick={() => sendMessage(inputText)}>发送</Button>
         </div>
@@ -123,8 +125,8 @@ function MessageBox(props) {
   const { sender, message } = props;
   return sender === 0 ? (
     <div className="received-dialog-line">
-       <div><img className="avatar" src={ROBOT_AVATAR}></img></div>
-       <div className="message">{message}</div>
+      <div><img className="avatar" src={ROBOT_AVATAR}></img></div>
+      <div className="message">{message}</div>
     </div>
   ) : (
     <div className='sent-dialog-line'>
