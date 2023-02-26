@@ -45,11 +45,13 @@ body {
 
 .typing-line {
   display: flex;
+  margin-bottom: 15px;
 }
 
 .sent-button {
   margin-left: 5px;
   border-radius: 10px;
+  height: 40px;
 }
 
 .received-dialog-line {
@@ -63,6 +65,21 @@ body {
   margin: 20px;
 }
 
+.loading-message {
+  width: 50px;
+  margin: 15px;
+  font-weight: 1200;
+  height: 30px;
+  font-size: 20px;
+  line-height: 30px;
+  max-width: 60%;
+  padding: 0 10px;
+  color:rgb(117, 130, 145);
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: 0px 2px 3px 0px rgba(128, 131, 228, 0.3);
+}
+
 .avatar {
   width: 50px;
   height: 50px;
@@ -71,6 +88,8 @@ body {
 }
 
 .message {
+  font-size: 14px;
+  line-height: 20px;
   margin: 0 15px;
   width: fit-content;
   max-width: 60%;

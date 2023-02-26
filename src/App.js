@@ -14,7 +14,7 @@ export const API = axios.create({
 
 const mockMessage = [{
   sender: 0,
-  message: '你好，我是钛月ai助手，欢迎使用聊天室，请问我一个问题吧'
+  message: '你好，我是钛月ai助手，欢迎使用聊天室，来问我一个问题吧'
 }
 ]
 
@@ -23,6 +23,8 @@ function App() {
   const [inputText, setInputText] = useState('');
   const [userId, setUserId] = useState('');
   const [balance, setBalance] = useState();
+  const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('');
 
   const scrollToBottom = () => {
     const v = document.getElementsByClassName('message-part')[0];
@@ -47,6 +49,8 @@ function App() {
       const data = response?.data?.data
       if (data?.wx_id) {
         setUserId(data.wx_id);
+      } else {
+        message.warn(data)
       }
       if (data?.quota) {
         setBalance(data.quota);
@@ -54,9 +58,46 @@ function App() {
     }).catch(r => console.log(r))
   }
 
+  const handleLoading = () => {
+    if (loadingText.length === 3) {
+      setLoadingText('');
+    } else {
+      setLoadingText(loadingText+'•');
+    }
+  }
+
   useEffect(() => {
     scrollToBottom();
   }, [messageList]);
+
+  useEffect(() => {
+    if (loading) {
+      setTimeout(handleLoading, 300)
+    }
+  }, [loadingText, loading])
+
+
+
+  const pay = async (amount) => {
+    const params = {
+      "user_id": userId,
+      "amount": 0.1
+    }
+    await axios.post(baseUrl + 'chat_proxy/wechat_jsapi_pay', params).then((response) => {
+      const responseData = response?.data?.data;
+      if (responseData) {
+        const { transaction_id, prepay_id } = responseData;
+        // console.log(transaction_id, prepay_id);
+        const checkPaymentParams = {
+          transaction_id
+        }
+        // onBridgeReady();
+        return axios.post(baseUrl + 'chat_proxy/wechat_jsapi_query', checkPaymentParams);
+      }
+    }).then((r) => {
+      message.info(`充值${r?.data.data?'成功':'失败'}`)
+    }).catch(r => console.log(r))
+  }
 
   const sendMessage = async (sendText) => {
     if (!userId) {
@@ -71,24 +112,37 @@ function App() {
     newMessageList.push({
       sender: 1,
       message: sendText
+    }, {
+      sender: 2
     });
+    setLoading(true);
     setInputText('');
     setMessageList(newMessageList);
     await axios.post(baseUrl + 'chat_proxy/get_chat_text', params).then((response) => {
       const responseMessage = response.data?.data?.result;
       const quota = response.data?.data?.quota;
       if (responseMessage && quota) {
-        newMessageList.push({
+        newMessageList.splice(-1, 1, {
           sender: 0,
           message: responseMessage
         });
         setMessageList(newMessageList);
         setBalance(quota);
       } else {
-        message.info(response.data?.data)
+        message.info(response.data?.data);
+        newMessageList.splice(-1, 1, {
+          sender: 0,
+          message: response.data?.data
+        });
+        setMessageList(newMessageList);
       }
       setTimeout(scrollToBottom, 0);
-    }).catch(r => console.log(r))
+    }).catch(r => {
+      console.log(r);
+      newMessageList.splice(-1, 1);
+      setMessageList(newMessageList);
+    })
+    setLoading(false);
   }
 
   return (
@@ -97,21 +151,21 @@ function App() {
       <div className='message-part'>
         {
           messageList.map(item =>
-            <MessageBox sender={item.sender} message={item.message}></MessageBox>
+            <MessageBox sender={item.sender} message={item.message} loadingText={loadingText}></MessageBox>
           )
         }
       </div>
       <div className='typing-part'>
-        <div className="">
-          <Button className='charge-button' disabled>充值</Button>
+        {/* <div className="">
+          <Button className='charge-button' onClick={pay}>充值</Button>
           <Button className='charge-button' disabled>历史对话</Button>
-          <div className='balance'>余额: 还有{balance}次提问</div>
-
-        </div>
+          <div className='balance'> 还可以提问{balance}次</div>
+        </div> */}
         <div className='typing-line'>
           <Input
             placeholder='请输入'
             value={inputText}
+            size="large"
             onChange={(v) => setInputText(v.target.value)}
             onPressEnter={() => sendMessage(inputText)}></Input>
           <Button className='sent-button' type='primary' onClick={() => sendMessage(inputText)}>发送</Button>
@@ -122,15 +176,23 @@ function App() {
 }
 
 function MessageBox(props) {
-  const { sender, message } = props;
+  const { sender, message, loadingText } = props;
+  if (sender === 2) {
+    return (
+      <div className="received-dialog-line">
+        <div><img className="avatar" src={ROBOT_AVATAR}></img></div>
+        <div className="loading-message">{loadingText}</div>
+      </div>
+    )
+  }
   return sender === 0 ? (
     <div className="received-dialog-line">
       <div><img className="avatar" src={ROBOT_AVATAR}></img></div>
-      <div className="message">{message}</div>
+      <div className="message"><span>{message}</span></div>
     </div>
   ) : (
     <div className='sent-dialog-line'>
-      <div className="message">{message}</div>
+      <div className="message"><span>{message}</span></div>
       <div><img className="avatar" src={USER_AVATAR}></img></div>
     </div>
   )
