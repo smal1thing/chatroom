@@ -21,7 +21,7 @@ const mockMessage = [{
 function App() {
   const [messageList, setMessageList] = useState(mockMessage);
   const [inputText, setInputText] = useState('');
-  const [userId, setUserId] = useState('');
+  const [userId, setUserId] = useState('oVa5_59m5WCOAyckPoNqKEg-4Edo');
   const [balance, setBalance] = useState();
   const [loading, setLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('');
@@ -62,7 +62,7 @@ function App() {
     if (loadingText.length === 3) {
       setLoadingText('');
     } else {
-      setLoadingText(loadingText+'•');
+      setLoadingText(loadingText + '•');
     }
   }
 
@@ -95,7 +95,7 @@ function App() {
         return axios.post(baseUrl + 'chat_proxy/wechat_jsapi_query', checkPaymentParams);
       }
     }).then((r) => {
-      message.info(`充值${r?.data.data?'成功':'失败'}`)
+      message.info(`充值${r?.data.data ? '成功' : '失败'}`)
     }).catch(r => console.log(r))
   }
 
@@ -128,13 +128,22 @@ function App() {
         });
         setMessageList(newMessageList);
         setBalance(quota);
-      } else {
+      } else if (response.data.data === 'no chat quota') {
         message.info(response.data?.data);
         newMessageList.splice(-1, 1, {
           sender: 0,
-          message: response.data?.data
+          message: `很抱歉，您的提问次数已经用完，若想获得新的提问次数，请将以下信息发送至【钛月AI问答助手】公众号，可获得新的免费次数哦~`
         });
+        newMessageList.push({
+          sender: 0,
+          message: `${userId}///@nhRqW6BHERdToPv34Kp5LCGDpG0eRshz6Ttpz3UXM0tVbrFuzqEYUaif5k39/#@`
+        })
         setMessageList(newMessageList);
+      } else if (response.data.data === 'sensitive words') {
+        newMessageList.splice(-1, 1, {
+          sender: 0,
+          message: `很抱歉，您发送的内容检测出敏感词，请换一种说法。如果仍有问题，请联系公众号【钛月AI问答助手】`
+        });
       }
       setTimeout(scrollToBottom, 0);
     }).catch(r => {
@@ -144,6 +153,8 @@ function App() {
     })
     setLoading(false);
   }
+
+
 
   return (
     <div className="chat-room">
