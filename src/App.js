@@ -21,7 +21,7 @@ const mockMessage = [{
 function App() {
   const [messageList, setMessageList] = useState(mockMessage);
   const [inputText, setInputText] = useState('');
-  const [userId, setUserId] = useState('oVa5_59m5WCOAyckPoNqKEg-4Edo');
+  const [userId, setUserId] = useState('');
   const [balance, setBalance] = useState();
   const [loading, setLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('');
@@ -155,7 +155,6 @@ function App() {
   }
 
 
-
   return (
     <div className="chat-room">
       {userId !== "" && <div className='user-id'>userid: {userId}</div>}
@@ -188,6 +187,9 @@ function App() {
 
 function MessageBox(props) {
   const { sender, message, loadingText } = props;
+  const handleTest = () => {
+    //handlePay();
+  }
   if (sender === 2) {
     return (
       <div className="received-dialog-line">
@@ -198,7 +200,7 @@ function MessageBox(props) {
   }
   return sender === 0 ? (
     <div className="received-dialog-line">
-      <div><img className="avatar" src={ROBOT_AVATAR}></img></div>
+      <div><img className="avatar" src={ROBOT_AVATAR} onClick={handleTest}></img></div>
       <div className="message"><span>{message}</span></div>
     </div>
   ) : (
@@ -207,6 +209,46 @@ function MessageBox(props) {
       <div><img className="avatar" src={USER_AVATAR}></img></div>
     </div>
   )
+}
+
+const handlePay = () => {
+  message.info("handlePay");
+  if (typeof window.WeixinJSBridge == "undefined") {
+    if (document.addEventListener) {
+      document.addEventListener(
+        "WeixinJSBridgeReady",
+        onBridgeReady,
+        false
+      );
+    } else if (document.attachEvent) {
+      document.attachEvent("WeixinJSBridgeReady", onBridgeReady);
+      document.attachEvent("onWeixinJSBridgeReady", onBridgeReady);
+    }
+  } else {
+    onBridgeReady();
+  }
+}
+
+const onBridgeReady = () => {
+  message.info("onBridgeReady");
+  window.WeixinJSBridge.invoke(
+    "getBrandWCPayRequest",
+    {
+      "appId": "wx2421b1c4370ec43b",     //公众号ID，由商户传入     
+      "timeStamp": "1395712654",     //时间戳，自1970年以来的秒数     
+      "nonceStr": "e61463f8efa94090b1f366cccfbbb444",      //随机串     
+      "package": "prepay_id=up_wx21201855730335ac86f8c43d1889123400",
+      "signType": "RSA",     //微信签名方式：     
+      "paySign": "oR9d8PuhnIc+YZ8cBHFCwfgpaK9gd7vaRvkYD7rthRAZ\/X+QBhcCYL21N7cHCTUxbQ+EAt6Uy+lwSN22f5YZvI45MLko8Pfso0jm46v5hqcVwrk6uddkGuT+Cdvu4WBqDzaDjnNa5UK3GfE1Wfl2gHxIIY5lLdUgWFts17D4WuolLLkiFZV+JSHMvH7eaLdT9N5GBovBwu5yYKUR7skR8Fu+LozcSqQixnlEZUfyE55feLOQTUYzLmR9pNtPbPsu6WVhbNHMS3Ss2+AehHvz+n64GDmXxbX++IOBvm2olHu3PsOUGRwhudhVf7UcGcunXt8cqNjKNqZLhLw4jq\/xDg==" //微信签名 
+    },
+    function (res) {
+      if (res.err_msg === "get_brand_wcpay_request:ok") {
+
+      } else {
+        message.info("fail");
+      }
+    }
+  );
 }
 
 export default App;
