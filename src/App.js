@@ -6,7 +6,7 @@ import 'antd/dist/antd.css';
 import './App.css';
 import JSEncrypt from 'jsencrypt'
 import CryptoJS from "crypto-js";
-import md5 from './md5';
+// import md5 from './md5';
 
 const PRIVATE_KEY = `-----BEGIN PRIVATE KEY-----
 MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDiIV/USRpWzzb+
@@ -133,12 +133,12 @@ function App() {
         const checkPaymentParams = {
           transaction_id
         }
-        handlePay(prepay_id);
-        const id = setInterval(() => getPaymentStatus(checkPaymentParams), 2000)
-        setTimeout(() => clearInterval(id), 15000);
-        setTimeId(id);
+        handlePay(prepay_id, checkPaymentParams);
+        // const id = setInterval(() => getPaymentStatus(checkPaymentParams), 2000)
+        // setTimeout(() => clearInterval(id), 15000);
+        // setTimeId(id);
       }
-    }).catch(r => console.log(r))
+    }).catch(r => console.log(r));
     setModalVisible(false);
   }
 
@@ -146,9 +146,10 @@ function App() {
     await axios.post(baseUrl + 'chat_proxy/wechat_jsapi_query', checkPaymentParams).then((response) => {
       if (response?.data.data) {
         message.info('充值成功');
-        clearInterval(refTimeId.current)
+      } else {
+        message.info(response)
       }
-    });
+    }).catch(r => message.warn(r));
   }
 
   const sendMessage = async (sendText) => {
@@ -184,7 +185,7 @@ function App() {
         message.info(response.data?.data);
         newMessageList.splice(-1, 1, {
           sender: 0,
-          message: `很抱歉，您的提问次数已经用完，若想获得新的提问次数，请将以下信息发送至【钛月AI问答助手】公众号，可获得新的免费次数哦~`
+          message: `抱歉你的对话次数已用完，可以充值继续购买`
         });
         newMessageList.push({
           sender: 0,
@@ -206,13 +207,62 @@ function App() {
     setLoading(false);
   }
 
+  const handlePay = (prepay_id, checkPaymentParams) => {
+    message.info("handlePay");
+    if (typeof window.WeixinJSBridge == "undefined") {
+      if (document.addEventListener) {
+        document.addEventListener(
+          "WeixinJSBridgeReady",
+          onBridgeReady,
+          false
+        );
+      } else if (document.attachEvent) {
+        document.attachEvent("WeixinJSBridgeReady", onBridgeReady);
+        document.attachEvent("onWeixinJSBridgeReady", onBridgeReady);
+      }
+    } else {
+      onBridgeReady(prepay_id, checkPaymentParams);
+    }
+  }
+  
+  const onBridgeReady = (prepay_id, checkPaymentParams) => {
+    message.info("onBridgeReady");
+    const appId = "wxfc9591f30d5e5b0b";              //公众号ID，由商户传入  
+    const timeStamp = parseInt(+new Date() / 1000);   //时间戳，自1970年以来的秒数  
+    const nonceStr = Math.random().toString(36).slice(-10) + Math.random().toString(36).slice(-10);
+    const packageString = "prepay_id=" + prepay_id;
+    const sign = `${appId}\n${timeStamp}\n${nonceStr}\n${packageString}\n`
+    let encryptor = new JSEncrypt();
+    encryptor.setPrivateKey(PRIVATE_KEY);
+    const paySign = encryptor.sign(sign, CryptoJS.SHA256, "sha256");
+    window.WeixinJSBridge.invoke(
+      "getBrandWCPayRequest",
+      {
+        "appId": appId,
+        "timeStamp": timeStamp.toString(),
+        "nonceStr": nonceStr,      //随机串     
+        "package": packageString,
+        "signType": "RSA",     //微信签名方式：     
+        "paySign": paySign //微信签名 
+      },
+      function (res) {
+        if (res.err_msg === "get_brand_wcpay_request:ok") {
+          message.info("ok");
+          getPaymentStatus(checkPaymentParams);
+        } else {
+          console.log("fail");
+        }
+      }
+    );
+  }
+
   return (
     <div className="chat-room">
-      {userId !== "" && <div className='user-id' onClick={() => {
+      {/* {userId !== "" && <div className='user-id' onClick={() => {
         setModalVisible(true);
         setRechargeAmount();
         setInvitationCode();
-      }}>userid: {userId}</div>}
+      }}>userid: {userId}</div>} */}
       <div className='message-part'>
         {
           messageList.map(item =>
@@ -222,14 +272,14 @@ function App() {
       </div>
       <div className='typing-part'>
         <div className="">
-          {/* <Button
+          <Button
             className='charge-button'
             onClick={() => {
               setModalVisible(true);
               setRechargeAmount();
               setInvitationCode();
             }}
-          >充值</Button> */}
+          >充值</Button>
           {/* <Button className='charge-button' disabled>历史对话</Button> */}
           {/* <div className='balance'> 还可以提问{balance}次</div> */}
         </div>
@@ -254,14 +304,14 @@ function App() {
           }
         }}
         onCancel={() => { setModalVisible(false); setRechargeAmount(); }}
-        width="60%"
+        width="70%"
         maskClosable={false}
         closable={false}
         cancelText="取消"
         okText="确认"
       >
-        <Button type={rechargeAmount === 3 ? "primary" : null} onClick={() => setRechargeAmount(3)}>3元</Button>
-        <Button type={rechargeAmount === 18 ? "primary" : null} onClick={() => setRechargeAmount(18)} style={{ "marginLeft": '5px' }}>18元</Button>
+        <Button type={rechargeAmount === 3 ? "primary" : null} onClick={() => setRechargeAmount(3)}>3元(15条)</Button>
+        <Button type={rechargeAmount === 26 ? "primary" : null} onClick={() => setRechargeAmount(26)} style={{ "marginLeft": '5px' }}>26元(150条)</Button>
         <Input value={invitationCode} onChange={(v) => setInvitationCode(v.target.value)} placeholder="请输入邀请码（如有）" style={{ "marginTop": '5px' }}></Input>
       </Modal>
     </div>
@@ -289,54 +339,6 @@ function MessageBox(props) {
       <div><img className="avatar" src={USER_AVATAR}></img></div>
     </div>
   )
-}
-
-const handlePay = (prepay_id) => {
-  message.info("handlePay");
-  if (typeof window.WeixinJSBridge == "undefined") {
-    if (document.addEventListener) {
-      document.addEventListener(
-        "WeixinJSBridgeReady",
-        onBridgeReady,
-        false
-      );
-    } else if (document.attachEvent) {
-      document.attachEvent("WeixinJSBridgeReady", onBridgeReady);
-      document.attachEvent("onWeixinJSBridgeReady", onBridgeReady);
-    }
-  } else {
-    onBridgeReady(prepay_id);
-  }
-}
-
-const onBridgeReady = (prepay_id) => {
-  message.info("onBridgeReady");
-  const appId = "wxfc9591f30d5e5b0b";              //公众号ID，由商户传入  
-  const timeStamp = parseInt(+new Date() / 1000);   //时间戳，自1970年以来的秒数  
-  const nonceStr = Math.random().toString(36).slice(-10) + Math.random().toString(36).slice(-10);
-  const packageString = "prepay_id=" + prepay_id;
-  const sign = `${appId}\n${timeStamp}\n${nonceStr}\n${packageString}\n`
-  let encryptor = new JSEncrypt();
-  encryptor.setPrivateKey(PRIVATE_KEY);
-  const paySign = encryptor.sign(sign, CryptoJS.SHA256, "sha256");
-  window.WeixinJSBridge.invoke(
-    "getBrandWCPayRequest",
-    {
-      "appId": appId,
-      "timeStamp": timeStamp.toString(),
-      "nonceStr": nonceStr,      //随机串     
-      "package": packageString,
-      "signType": "RSA",     //微信签名方式：     
-      "paySign": paySign //微信签名 
-    },
-    function (res) {
-      if (res.err_msg === "get_brand_wcpay_request:ok") {
-        message.info("ok");
-      } else {
-        message.info("fail");
-      }
-    }
-  );
 }
 
 export default App;
