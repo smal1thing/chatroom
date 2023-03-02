@@ -59,6 +59,7 @@ function App() {
   const [messageList, setMessageList] = useState(mockMessage);
   const [inputText, setInputText] = useState('');
   const [userId, setUserId] = useState('');
+  const [userInvitationCode, setUserInvitationCode] = useState('');
   const [balance, setBalance] = useState();
   const [loading, setLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('');
@@ -93,10 +94,15 @@ function App() {
       if (data?.wx_id) {
         setUserId(data.wx_id);
       } else {
-        message.warn(data)
+        message.warn(data);
       }
       if (data?.quota) {
         setBalance(data.quota);
+      }
+      if (data?.invitation_code) {
+        setUserInvitationCode(data.invitation_code);
+      } else {
+        message.warn(data);
       }
     }).catch(r => console.log(r))
   }
@@ -134,7 +140,7 @@ function App() {
           transaction_id: transaction_id,
           invitation_code: invitationCode,
         }
-        console.log(checkPaymentParams);
+        //console.log(checkPaymentParams);
         handlePay(prepay_id, checkPaymentParams);
         // const id = setInterval(() => getPaymentStatus(checkPaymentParams), 2000)
         // setTimeout(() => clearInterval(id), 15000);
@@ -282,8 +288,8 @@ function App() {
               setInvitationCode();
             }}
           >充值</Button>
-          {/* <Button className='charge-button' disabled>历史对话</Button> */}
-          {/* <div className='balance'> 还可以提问{balance}次</div> */}
+
+          {userInvitationCode !== '' && <div className='balance'>您的邀请码: {userInvitationCode}</div>}
         </div>
         <div className='typing-line'>
           <Input
