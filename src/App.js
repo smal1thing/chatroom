@@ -131,8 +131,10 @@ function App() {
         const { transaction_id, prepay_id } = responseData;
         // console.log(transaction_id, prepay_id);
         const checkPaymentParams = {
-          transaction_id
+          transaction_id: transaction_id,
+          invitation_code: invitationCode,
         }
+        console.log(checkPaymentParams);
         handlePay(prepay_id, checkPaymentParams);
         // const id = setInterval(() => getPaymentStatus(checkPaymentParams), 2000)
         // setTimeout(() => clearInterval(id), 15000);
@@ -224,7 +226,7 @@ function App() {
       onBridgeReady(prepay_id, checkPaymentParams);
     }
   }
-  
+
   const onBridgeReady = (prepay_id, checkPaymentParams) => {
     message.info("onBridgeReady");
     const appId = "wxfc9591f30d5e5b0b";              //公众号ID，由商户传入  
