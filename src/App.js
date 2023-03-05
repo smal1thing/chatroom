@@ -66,7 +66,6 @@ function App() {
   const [modalVisible, setModalVisible] = useState(false);
   const [rechargeAmount, setRechargeAmount] = useState();
   const [invitationCode, setInvitationCode] = useState();
-  const [timeId, setTimeId, refTimeId] = useStateAndRef(0);
 
   const scrollToBottom = () => {
     const v = document.getElementsByClassName('message-part')[0];
@@ -195,10 +194,6 @@ function App() {
           sender: 0,
           message: `抱歉你的对话次数已用完，可以充值继续购买`
         });
-        newMessageList.push({
-          sender: 0,
-          message: `${userId}///@nhRqW6BHERdToPv34Kp5LCGDpG0eRshz6Ttpz3UXM0tVbrFuzqEYUaif5k39/#@`
-        })
         setMessageList(newMessageList);
       } else if (response.data.data === 'sensitive words') {
         newMessageList.splice(-1, 1, {
@@ -288,7 +283,6 @@ function App() {
               setInvitationCode();
             }}
           >充值</Button>
-
           {userInvitationCode !== '' && <div className='balance'>您的邀请码: {userInvitationCode}</div>}
         </div>
         <div className='typing-line'>
@@ -318,8 +312,8 @@ function App() {
         cancelText="取消"
         okText="确认"
       >
-        <Button type={rechargeAmount === 3 ? "primary" : null} onClick={() => setRechargeAmount(3)}>3元(15条)</Button>
-        <Button type={rechargeAmount === 26 ? "primary" : null} onClick={() => setRechargeAmount(26)} style={{ "marginLeft": '5px' }}>26元(150条)</Button>
+        <Button type={rechargeAmount === 3 ? "primary" : null} onClick={() => setRechargeAmount(3)}>3元(30条)</Button>
+        <Button type={rechargeAmount === 18 ? "primary" : null} onClick={() => setRechargeAmount(18)} style={{ "marginLeft": '5px' }}>18元(300条)</Button>
         <Input value={invitationCode} onChange={(v) => setInvitationCode(v.target.value)} placeholder="请输入邀请码（如有）" style={{ "marginTop": '5px' }}></Input>
       </Modal>
     </div>
