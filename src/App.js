@@ -2,6 +2,7 @@
 import axios from "axios";
 import { useState, useEffect, useRef } from 'react';
 import { Input, Button, message, Modal } from 'antd';
+import { ShareModal } from './ShareModal'
 import 'antd/dist/antd.css';
 import './App.css';
 import JSEncrypt from 'jsencrypt'
@@ -64,8 +65,10 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
   const [rechargeAmount, setRechargeAmount] = useState();
   const [invitationCode, setInvitationCode] = useState();
+  const [shareInvitationUrl, setShareInvitationUrl] = useState('');
   const [timeId, setTimeId, refTimeId] = useStateAndRef(0);
 
   const scrollToBottom = () => {
@@ -80,15 +83,16 @@ function App() {
     const found = params?.find(param => param.includes('code='));
     if (found) {
       const code = found.split('code=')[1];
-      getUserId(code)
+      const invtCode = found.split('state=')[1];
+      getUserId(code, invtCode);
     } else {
       message.warn('缺少用户code')
     }
   }, [])
 
-  const getUserId = async (code) => {
+  const getUserId = async (code, invtCode) => {
     console.log(code)
-    await axios.get(baseUrl + 'chat_proxy/get_user_wx_id?js_code=' + code).then((response) => {
+    await axios.get(`${baseUrl}chat_proxy/get_user_wx_id?js_code=${code}&ic=${invtCode}`).then((response) => {
       const data = response?.data?.data
       console.log(data)
       if (data?.wx_id) {
@@ -101,6 +105,9 @@ function App() {
       }
       if (data?.invitation_code) {
         setUserInvitationCode(data.invitation_code);
+      }
+      if (data?.share_invitation_url) {
+        setShareInvitationUrl(data.share_invitation_url);
       } else {
         message.warn(data);
       }
@@ -135,16 +142,11 @@ function App() {
       const responseData = response?.data?.data;
       if (responseData) {
         const { transaction_id, prepay_id } = responseData;
-        // console.log(transaction_id, prepay_id);
         const checkPaymentParams = {
           transaction_id: transaction_id,
           invitation_code: invitationCode,
         }
-        //console.log(checkPaymentParams);
         handlePay(prepay_id, checkPaymentParams);
-        // const id = setInterval(() => getPaymentStatus(checkPaymentParams), 2000)
-        // setTimeout(() => clearInterval(id), 15000);
-        // setTimeId(id);
       }
     }).catch(r => console.log(r));
     setModalVisible(false);
@@ -288,6 +290,12 @@ function App() {
               setInvitationCode();
             }}
           >充值</Button>
+          <Button
+            className='charge-button'
+            onClick={() => {
+              setShareModalOpen(true);
+            }}
+          >分享</Button>
 
           {userInvitationCode !== '' && <div className='balance'>您的邀请码: {userInvitationCode}</div>}
         </div>
@@ -322,6 +330,10 @@ function App() {
         <Button type={rechargeAmount === 26 ? "primary" : null} onClick={() => setRechargeAmount(26)} style={{ "marginLeft": '5px' }}>26元(150条)</Button>
         <Input value={invitationCode} onChange={(v) => setInvitationCode(v.target.value)} placeholder="请输入邀请码（如有）" style={{ "marginTop": '5px' }}></Input>
       </Modal>
+      <ShareModal open={shareModalOpen}
+        onCancel={() => { setShareModalOpen(false) }}
+        shareInvitationUrl={shareInvitationUrl}>
+      </ShareModal>
     </div>
   );
 }
