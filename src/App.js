@@ -1,12 +1,15 @@
 
 import axios from "axios";
+import { SendOutlined, MoneyCollectOutlined, GiftOutlined } from '@ant-design/icons';
 import { useState, useEffect, useRef } from 'react';
 import { Input, Button, message, Modal } from 'antd';
-import { ShareModal } from './ShareModal'
+import { ShareModal } from './components/ShareModal'
+import { MessageBox } from "./components/MessageBox";
 import 'antd/dist/antd.css';
 import './App.css';
 import JSEncrypt from 'jsencrypt'
 import CryptoJS from "crypto-js";
+import { BaseButton } from "./components/BaseButton";
 // import md5 from './md5';
 
 const PRIVATE_KEY = `-----BEGIN PRIVATE KEY-----
@@ -37,8 +40,7 @@ s1ujMUdMIk/a7gnkNbmclyeD0pIj9A4PQYyt+Xm/+QKBgQCar5TCarOV93AemxPo
 bDjpcVytgh4M9nE2hImmnEOWF1Mqnug09QRg1qhqLVpTjRB+fLNwxq0S84oz4wnQ
 jTFseK2f9Iwvn6t+AlDrB9rNyQ==
 -----END PRIVATE KEY-----`
-const ROBOT_AVATAR = "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg2.doubanio.com%2Fview%2Frichtext%2Flarge%2Fpublic%2Fp53389253.jpg&refer=http%3A%2F%2Fimg2.doubanio.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1679757641&t=a44588a81d7efe7dc16416d4b89059eb";
-const USER_AVATAR = "https://ts1.cn.mm.bing.net/th/id/R-C.0a1f275d1d27d96f996ae5af9cc838eb?rik=ifvouAHyyFj8cg&riu=http%3a%2f%2fwww.yulumi.cn%2fgl%2fuploads%2fallimg%2f201204%2f3-20120415332MI.jpg&ehk=FWvR8lLqblGnk%2bLTcv7CSk8AlAh1U5CdHJDAoHY45rc%3d&risl=&pid=ImgRaw&r=0";
+
 const baseUrl = "https://platypus.yazuishoudalu.com/"
 export const API = axios.create({
   baseURL: baseUrl,
@@ -46,7 +48,7 @@ export const API = axios.create({
 
 const mockMessage = [{
   sender: 0,
-  message: '你好，我是钛月ai助手，欢迎使用聊天室，来问我一个问题吧'
+  message: '你好！我是钛月AI助手：基于与国外ChatGPT一样的gpt3.5训练的强大人工智能引擎开发。\n\n我可以：写论文润色、角色扮演、知识百科、百度答题、作业解答分析、写代码等等...'
 }];
 
 function useStateAndRef(initial) {
@@ -269,9 +271,7 @@ function App() {
 
   return (
     <div className="chat-room">
-      {debugString !== "" && <div className='user-id' onClick={() => {
-
-      }}>{debugString}</div>}
+      {debugString !== "" && <div className='user-id' onClick={() => {}}>{debugString}</div>}
       <div className='message-part'>
         {
           messageList.map(item =>
@@ -281,22 +281,23 @@ function App() {
       </div>
       <div className='typing-part'>
         <div className="">
-          <Button
-            className='charge-button'
+          <BaseButton
+            buttonText="充值"
             onClick={() => {
               setModalVisible(true);
               setRechargeAmount();
               setInvitationCode();
             }}
-          >充值</Button>
-          <Button
-            className='charge-button'
+            icon={<MoneyCollectOutlined style={{color: 'gold'}}/>}
+          />
+          <BaseButton
+            buttonText="分享"
             onClick={() => {
               setShareModalOpen(true);
             }}
-          >分享</Button>
-
-          {userInvitationCode !== '' && <div className='balance'>您的邀请码: {userInvitationCode}</div>}
+            icon={<GiftOutlined style={{color: 'red'}}/>}
+          />
+          {/* {userInvitationCode !== '' && <div className='balance'>您的邀请码: {userInvitationCode}</div>} */}
         </div>
         <div className='typing-line'>
           <Input
@@ -304,13 +305,15 @@ function App() {
             value={inputText}
             size="large"
             onChange={(v) => setInputText(v.target.value)}
-            onPressEnter={() => sendMessage(inputText)}></Input>
-          <Button className='sent-button' type='primary' onClick={() => sendMessage(inputText)}>发送</Button>
+            onPressEnter={() => sendMessage(inputText)}
+            suffix={(<Button icon={(<SendOutlined style={{color: '#74c6b0', 'font-size': '20px'}}/>)} onClick={() => sendMessage(inputText)} type="text"/>)}
+          />
+          {/* <Button className='sent-button' type='primary' onClick={() => sendMessage(inputText)}>发送</Button> */}
         </div>
       </div>
       <Modal
         title="充值"
-        visible={modalVisible}
+        open={modalVisible}
         onOk={() => {
           if (rechargeAmount) {
             invokePaymentWindow(rechargeAmount, invitationCode);
@@ -327,7 +330,12 @@ function App() {
       >
         <Button type={rechargeAmount === 3 ? "primary" : null} onClick={() => setRechargeAmount(3)}>3元(30条)</Button>
         <Button type={rechargeAmount === 18 ? "primary" : null} onClick={() => setRechargeAmount(18)} style={{ "marginLeft": '5px' }}>18元(300条)</Button>
-        <Input value={invitationCode} onChange={(v) => setInvitationCode(v.target.value)} placeholder="请输入邀请码（如有）" style={{ "marginTop": '5px' }}></Input>
+        <Input 
+          value={invitationCode} 
+          onChange={(v) => setInvitationCode(v.target.value)} 
+          placeholder="请输入邀请码（如有）" 
+          style={{ "marginTop": '5px' }}>
+        </Input>
       </Modal>
       <ShareModal open={shareModalOpen}
         onCancel={() => { setShareModalOpen(false) }}
@@ -335,29 +343,6 @@ function App() {
       </ShareModal>
     </div>
   );
-}
-
-function MessageBox(props) {
-  const { sender, message, loadingText } = props;
-  if (sender === 2) {
-    return (
-      <div className="received-dialog-line">
-        <div><img className="avatar" src={ROBOT_AVATAR}></img></div>
-        <div className="loading-message">{loadingText}</div>
-      </div>
-    )
-  }
-  return sender === 0 ? (
-    <div className="received-dialog-line">
-      <div><img className="avatar" src={ROBOT_AVATAR}></img></div>
-      <div className="message"><span>{message}</span></div>
-    </div>
-  ) : (
-    <div className='sent-dialog-line'>
-      <div className="message"><span>{message}</span></div>
-      <div><img className="avatar" src={USER_AVATAR}></img></div>
-    </div>
-  )
 }
 
 export default App;
