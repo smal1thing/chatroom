@@ -69,7 +69,8 @@ function App() {
   const [rechargeAmount, setRechargeAmount] = useState();
   const [invitationCode, setInvitationCode] = useState();
   const [shareInvitationUrl, setShareInvitationUrl] = useState('');
-  const [timeId, setTimeId, refTimeId] = useStateAndRef(0);
+
+  const [debugString, setDebugString] = useState('');
 
   const scrollToBottom = () => {
     const v = document.getElementsByClassName('message-part')[0];
@@ -80,10 +81,14 @@ function App() {
 
   useEffect(() => {
     const params = window.location.search?.split('?')[1]?.split('&');
-    const found = params?.find(param => param.includes('code='));
-    if (found) {
-      const code = found.split('code=')[1];
-      const invtCode = found.split('state=')[1];
+    const foundCode = params?.find(param => param.includes('code='));
+    const foundState = params?.find(param => param.includes('state='))
+    if (foundCode) {
+      const code = foundCode.split('code=')[1];
+      let invtCode = '';
+      if (foundState) {
+        invtCode = foundState.split('state=')[1];
+      }
       getUserId(code, invtCode);
     } else {
       message.warn('缺少用户code')
@@ -91,7 +96,7 @@ function App() {
   }, [])
 
   const getUserId = async (code, invtCode) => {
-    console.log(code)
+    console.log(code, invtCode);
     await axios.get(`${baseUrl}chat_proxy/get_user_wx_id?js_code=${code}&ic=${invtCode}`).then((response) => {
       const data = response?.data?.data
       console.log(data)
@@ -197,10 +202,6 @@ function App() {
           sender: 0,
           message: `抱歉你的对话次数已用完，可以充值继续购买`
         });
-        newMessageList.push({
-          sender: 0,
-          message: `${userId}///@nhRqW6BHERdToPv34Kp5LCGDpG0eRshz6Ttpz3UXM0tVbrFuzqEYUaif5k39/#@`
-        })
         setMessageList(newMessageList);
       } else if (response.data.data === 'sensitive words') {
         newMessageList.splice(-1, 1, {
@@ -268,11 +269,9 @@ function App() {
 
   return (
     <div className="chat-room">
-      {/* {userId !== "" && <div className='user-id' onClick={() => {
-        setModalVisible(true);
-        setRechargeAmount();
-        setInvitationCode();
-      }}>userid: {userId}</div>} */}
+      {debugString !== "" && <div className='user-id' onClick={() => {
+
+      }}>{debugString}</div>}
       <div className='message-part'>
         {
           messageList.map(item =>
@@ -326,8 +325,8 @@ function App() {
         cancelText="取消"
         okText="确认"
       >
-        <Button type={rechargeAmount === 3 ? "primary" : null} onClick={() => setRechargeAmount(3)}>3元(15条)</Button>
-        <Button type={rechargeAmount === 26 ? "primary" : null} onClick={() => setRechargeAmount(26)} style={{ "marginLeft": '5px' }}>26元(150条)</Button>
+        <Button type={rechargeAmount === 3 ? "primary" : null} onClick={() => setRechargeAmount(3)}>3元(30条)</Button>
+        <Button type={rechargeAmount === 18 ? "primary" : null} onClick={() => setRechargeAmount(18)} style={{ "marginLeft": '5px' }}>18元(300条)</Button>
         <Input value={invitationCode} onChange={(v) => setInvitationCode(v.target.value)} placeholder="请输入邀请码（如有）" style={{ "marginTop": '5px' }}></Input>
       </Modal>
       <ShareModal open={shareModalOpen}
