@@ -59,7 +59,7 @@ function useStateAndRef(initial) {
 function App() {
   const [messageList, setMessageList] = useState(mockMessage);
   const [inputText, setInputText] = useState('');
-  const [userId, setUserId] = useState('');
+  const [userId, setUserId] = useState('oVa5_5_3o9WK2x3e_jIOe3pMz7Bc');
   const [userInvitationCode, setUserInvitationCode] = useState('');
   const [balance, setBalance] = useState();
   const [loading, setLoading] = useState(false);
@@ -188,6 +188,7 @@ function App() {
     setMessageList(newMessageList);
     await axios.post(baseUrl + 'chat_proxy/get_chat_text', params).then((response) => {
       const responseMessage = response.data?.data?.result;
+      console.log(responseMessage);
       const quota = response.data?.data?.quota;
       if (responseMessage && quota) {
         newMessageList.splice(-1, 1, {
