@@ -46,7 +46,15 @@ export const API = axios.create({
 
 const mockMessage = [{
   sender: 0,
-  message: '你好，我是钛月ai助手，欢迎使用聊天室，来问我一个问题吧'
+  message: `你好！我是钛月AI助手：基于与国外ChatGPT一样的gpt3.5训练的强大人工智能引擎开发。
+  我可以：写论文润色、角色扮演、知识百科、百度答题、作业解答分析、写代码等等...
+  你可以尝试输入问题：
+  [解释下量子计算机的原理]
+  [我要举办生日会，策划一个有趣的活动 ]
+  [写一篇广告策划方案]
+  如需更多免费消息次数：
+  “分享”框分享你的专属链接给15个朋友自动获得7天免费会员
+  “分享”框分享你的专属链接给5个好友自动获得30条消息`
 }];
 
 function useStateAndRef(initial) {
@@ -203,7 +211,13 @@ function App() {
       } else if (response.data.data === 'no chat quota') {
         newMessageList.splice(-1, 1, {
           sender: 0,
-          message: `抱歉你的对话次数已用完，可以充值继续购买`
+          message: `如需更多消息次数：
+          
+          “分享”框复制分享你的专属链接给15个朋友自动获得7天免费会员
+          或
+          “分享”框复制分享你的专属链接给5个好友自动获得30条消息
+          或
+          购买18元包月高级无限制会员`
         });
         setMessageList(newMessageList);
       } else if (response.data.data === 'sensitive words') {
