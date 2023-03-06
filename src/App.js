@@ -153,7 +153,10 @@ function App() {
         }
         handlePay(prepay_id, checkPaymentParams);
       }
-    }).catch(r => console.log(r));
+    }).catch(r => {
+      console.log(r)
+      message.warn("请联系公众号【钛月ai助手】");
+    });
     setModalVisible(false);
   }
 
@@ -198,7 +201,6 @@ function App() {
         setMessageList(newMessageList);
         setBalance(quota);
       } else if (response.data.data === 'no chat quota') {
-        message.info(response.data?.data);
         newMessageList.splice(-1, 1, {
           sender: 0,
           message: `抱歉你的对话次数已用完，可以充值继续购买`
@@ -220,7 +222,6 @@ function App() {
   }
 
   const handlePay = (prepay_id, checkPaymentParams) => {
-    message.info("handlePay");
     if (typeof window.WeixinJSBridge == "undefined") {
       if (document.addEventListener) {
         document.addEventListener(
@@ -238,7 +239,6 @@ function App() {
   }
 
   const onBridgeReady = (prepay_id, checkPaymentParams) => {
-    message.info("onBridgeReady");
     const appId = "wxfc9591f30d5e5b0b";              //公众号ID，由商户传入  
     const timeStamp = parseInt(+new Date() / 1000);   //时间戳，自1970年以来的秒数  
     const nonceStr = Math.random().toString(36).slice(-10) + Math.random().toString(36).slice(-10);
@@ -259,7 +259,6 @@ function App() {
       },
       function (res) {
         if (res.err_msg === "get_brand_wcpay_request:ok") {
-          message.info("ok");
           getPaymentStatus(checkPaymentParams);
         } else {
           console.log("fail");
