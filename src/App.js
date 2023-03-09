@@ -48,7 +48,16 @@ export const API = axios.create({
 
 const mockMessage = [{
   sender: 0,
-  message: '你好！我是钛月AI助手：基于与国外ChatGPT一样的gpt3.5训练的强大人工智能引擎开发。\n\n我可以：写论文润色、角色扮演、知识百科、百度答题、作业解答分析、写代码等等...'
+  message: `你好！我是钛月AI助手：基于与国外ChatGPT一样的gpt3.5训练的强大人工智能引擎开发。
+  我可以：写论文润色、角色扮演、知识百科、百度答题、作业解答分析、写代码等等...
+
+  你可以尝试输入问题：
+  [解释下量子计算机的原理]
+  [我要举办生日会，策划一个有趣的活动 ]
+  [写一篇广告策划方案]
+
+  如需更多免费消息次数：
+  “分享”框分享你的专属链接给1个新用户自动获得5条消息额`
 }];
 
 function useStateAndRef(initial) {
@@ -61,7 +70,7 @@ function useStateAndRef(initial) {
 function App() {
   const [messageList, setMessageList] = useState(mockMessage);
   const [inputText, setInputText] = useState('');
-  const [userId, setUserId] = useState('oVa5_5_3o9WK2x3e_jIOe3pMz7Bc');
+  const [userId, setUserId] = useState('');
   const [userInvitationCode, setUserInvitationCode] = useState('');
   const [balance, setBalance] = useState();
   const [loading, setLoading] = useState(false);
@@ -205,7 +214,13 @@ function App() {
       } else if (response.data.data === 'no chat quota') {
         newMessageList.splice(-1, 1, {
           sender: 0,
-          message: `抱歉你的对话次数已用完，可以充值继续购买`
+          message: `如需更多消息次数：
+
+          “分享”框复制分享你的专属链接给15个朋友自动获得7天免费会员
+          或
+          “分享”框复制分享你的专属链接给5个好友自动获得30条消息
+          或
+          购买18元包月高级无限制会员`
         });
         setMessageList(newMessageList);
       } else if (response.data.data === 'sensitive words') {
@@ -271,7 +286,7 @@ function App() {
 
   return (
     <div className="chat-room">
-      {debugString !== "" && <div className='user-id' onClick={() => {}}>{debugString}</div>}
+      {debugString !== "" && <div className='user-id' onClick={() => { }}>{debugString}</div>}
       <div className='message-part'>
         {
           messageList.map(item =>
@@ -288,14 +303,14 @@ function App() {
               setRechargeAmount();
               setInvitationCode();
             }}
-            icon={<MoneyCollectOutlined style={{color: 'gold'}}/>}
+            icon={<MoneyCollectOutlined style={{ color: 'gold' }} />}
           />
           <BaseButton
             buttonText="分享"
             onClick={() => {
               setShareModalOpen(true);
             }}
-            icon={<GiftOutlined style={{color: 'red'}}/>}
+            icon={<GiftOutlined style={{ color: 'red' }} />}
           />
           {/* {userInvitationCode !== '' && <div className='balance'>您的邀请码: {userInvitationCode}</div>} */}
         </div>
@@ -306,7 +321,7 @@ function App() {
             size="large"
             onChange={(v) => setInputText(v.target.value)}
             onPressEnter={() => sendMessage(inputText)}
-            suffix={(<Button icon={(<SendOutlined style={{color: '#74c6b0', 'font-size': '20px'}}/>)} onClick={() => sendMessage(inputText)} type="text"/>)}
+            suffix={(<Button icon={(<SendOutlined style={{ color: '#74c6b0', 'font-size': '20px' }} />)} onClick={() => sendMessage(inputText)} type="text" />)}
           />
           {/* <Button className='sent-button' type='primary' onClick={() => sendMessage(inputText)}>发送</Button> */}
         </div>
@@ -330,10 +345,10 @@ function App() {
       >
         <Button type={rechargeAmount === 3 ? "primary" : null} onClick={() => setRechargeAmount(3)}>3元(30条)</Button>
         <Button type={rechargeAmount === 18 ? "primary" : null} onClick={() => setRechargeAmount(18)} style={{ "marginLeft": '5px' }}>18元(300条)</Button>
-        <Input 
-          value={invitationCode} 
-          onChange={(v) => setInvitationCode(v.target.value)} 
-          placeholder="请输入邀请码（如有）" 
+        <Input
+          value={invitationCode}
+          onChange={(v) => setInvitationCode(v.target.value)}
+          placeholder="请输入邀请码（如有）"
           style={{ "marginTop": '5px' }}>
         </Input>
       </Modal>
