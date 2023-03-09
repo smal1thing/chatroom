@@ -48,13 +48,14 @@ const mockMessage = [{
   sender: 0,
   message: `你好！我是钛月AI助手：基于与国外ChatGPT一样的gpt3.5训练的强大人工智能引擎开发。
   我可以：写论文润色、角色扮演、知识百科、百度答题、作业解答分析、写代码等等...
+
   你可以尝试输入问题：
   [解释下量子计算机的原理]
   [我要举办生日会，策划一个有趣的活动 ]
   [写一篇广告策划方案]
+
   如需更多免费消息次数：
-  “分享”框分享你的专属链接给15个朋友自动获得7天免费会员
-  “分享”框分享你的专属链接给5个好友自动获得30条消息`
+  “分享”框分享你的专属链接给1个新用户自动获得5条消息额`
 }];
 
 function useStateAndRef(initial) {
@@ -67,7 +68,7 @@ function useStateAndRef(initial) {
 function App() {
   const [messageList, setMessageList] = useState(mockMessage);
   const [inputText, setInputText] = useState('');
-  const [userId, setUserId] = useState('oVa5_5_3o9WK2x3e_jIOe3pMz7Bc');
+  const [userId, setUserId] = useState('');
   const [userInvitationCode, setUserInvitationCode] = useState('');
   const [balance, setBalance] = useState();
   const [loading, setLoading] = useState(false);
@@ -212,7 +213,7 @@ function App() {
         newMessageList.splice(-1, 1, {
           sender: 0,
           message: `如需更多消息次数：
-          
+
           “分享”框复制分享你的专属链接给15个朋友自动获得7天免费会员
           或
           “分享”框复制分享你的专属链接给5个好友自动获得30条消息
