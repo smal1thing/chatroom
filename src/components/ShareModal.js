@@ -1,23 +1,21 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import ClipboardJS from 'clipboard';
 import { Input, Button, message, Modal } from 'antd';
 import { QRCodeSVG } from 'qrcode.react';
 
 export function ShareModal(props) {
     const { open, onCancel, shareInvitationUrl } = props;
-    const textRef = useRef(null);
-    let clipboard = null;
-    const handleClick = () => {
-        if (!clipboard) {
-            clipboard = new ClipboardJS(textRef.current, {
+    const textRef = useCallback((node) => {
+        if (node !== null) {
+            console.log(node);
+            const clipboard = new ClipboardJS(node, {
                 text: () => shareInvitationUrl,
                 action: 'copy'
             });
-
             clipboard.on('success', () => { message.info("复制成功") });
         }
 
-    };
+    });
     return (<Modal
         open={open}
         onCancel={onCancel}
@@ -31,7 +29,6 @@ export function ShareModal(props) {
             }}>
             您的分享链接：
             <button ref={textRef}
-                onClick={handleClick}
                 style={{
                     background: 'grey',
                     borderRadius: '10px',
