@@ -250,18 +250,22 @@ export function PayModal(props) {
                 <div><i className="fa-solid fa-circle-check"></i><span style={{ marginLeft: '4px' }}>尝鲜专用</span></div>
             </div>
 
-            <button
+            <Button
                 onClick={() => {
                     invokePaymentWindow();
                 }}
+                size='large'
+                type='primary'
                 style={{
                     width: '150px',
                     fontSize: '18px',
                     borderRadius: '5px',
                     background: 'white',
+                    color: 'black',
+                    border: 'black',
                     marginTop: '20px',
                     alignSelf: 'center',
-                }}>购买</button>
+                }}>购买</Button>
         </div>
 
     </Modal >)
