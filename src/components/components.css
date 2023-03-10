@@ -1,4 +1,3 @@
-
 .charge-button {
   margin: 0 10px 10px 0;
   padding: 5px 10px;
@@ -58,4 +57,9 @@
   word-wrap: break-word;
   white-space: pre-line;
   /* box-shadow: 0px 2px 3px 0px rgba(128, 131, 228, 0.3); */
+}
+
+.ant-modal-content {
+  background: #d5f5e8 !important;
+  border-radius: 20px !important;
 }

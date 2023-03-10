@@ -4,42 +4,14 @@ import { SendOutlined, MoneyCollectOutlined, GiftOutlined } from '@ant-design/ic
 import { useState, useEffect, useRef } from 'react';
 import { Input, Button, message, Modal } from 'antd';
 import { ShareModal } from './components/ShareModal'
+import { PayModal } from "./components/PayModal";
 import { MessageBox } from "./components/MessageBox";
 import 'antd/dist/antd.css';
 import './App.css';
-import JSEncrypt from 'jsencrypt'
-import CryptoJS from "crypto-js";
 import { BaseButton } from "./components/BaseButton";
 // import md5 from './md5';
 
-const PRIVATE_KEY = `-----BEGIN PRIVATE KEY-----
-MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDiIV/USRpWzzb+
-6f92AiZSApE6Xka1iJztOfwt9mYQ88mweFRQjurRLw+6aP9yFKD1GmZhoEH/ToJ7
-n0N3S2Xu6cT70piHQRGAVP50sxTYEfIm7y1Qro3LKMdWlkbgeyCPXojUkT/z9nGU
-zJqAraoHX4SQZhqeGuAfHNMj2evIKJ/GoBSTUXZxfI2kuHg9Y6W7kt7VXTa6Xvw3
-snZytnsfx6Dpva/ouzBMfHWfoauOLdG53vzFAlLEbjxRuyQAQhMclGHUnGoxqjwP
-QOIGrngkgyIkp7MRSLIGp3Vo5jaIcHBTx8hx9n4SWFO/bBvZYo0xK4nWdPC8q4JL
-q+8q9YAHAgMBAAECggEBANy6HRNXRBmGbLVI7a5gDM2yadYinjymnB9HoWuv/xL/
-FFloK0zzJCyKFn0r7mSJ1E9LtLIIv0MZfG51GGLCuz4I+9mfSHmFvzKYRETfZTI/
-2jG892uw5wFuzZ0sVQTbyv2HFmL/YQCfB2FqkkmWusg1qW1V7Rd1Pl3AQizVk7ws
-bS7gRmXF2OGBIu/8mLzAfdNnI8j9uTjDcC49M9KdkPkypXN7yiByjU+angYq+giG
-/puCkMEH9d44eFN4i0iA8BnKMEwxugnKilL/wynbgw0JHnutwvPF3oeNj+J6LVaw
-wU4Gfoijov2ni5MP4fH6tG7dIlhqjdNZsmeMQ6pkYTECgYEA+jN8zuXG6tSXaRR3
-ZgjeLk9b6iUADErNggpmZ62KWx/gVI2OActSW6JIB5SHOSXbx5I7qTfQAjjN+BaY
-pvJJYOsZdU+Bk6JeaUAcsXGCi9L2HhCmo+t19UNe1FVV105T4YZEMKHRTRvjKd4f
-t8LS5j6RzfI0l9Rprn3EfKDMpX8CgYEA518Rf8CETc2vZIgwOoSd4hyJ6J1r2wag
-RrPx0AO2DZqu499K7hdGp/ztM/xlikW1a4+aurte4A7Gr41Gxh+dVQ5hDUTtewtR
-bPDaMAYi1NRo0kraHXCpbOixOhLW4XNWTM1ALypE+aLxEiGBc3Oe5sIf0WAJLWVb
-EVnpsQueOXkCgYEAsZ9n1YIuq3vtWb4b3aYiBYJ1YE6QMCnSp6U2ehgrhvGkUqKD
-1CZB+6fDtw3syddkpdPc4w8qbslg/+UazjpneZSt6Chfdy3oFJRdSmOpKBbGfyWX
-B/wbK9l+MwO6AzYqOosVUekvK6zGomx82/pFuwtke26dg8RamnPS0B9f6YUCgYBB
-PsTfgrmMezE3p1P6XIVtSuD08NeGZ0LxTTMmlrVS9sjUx5YIuBWbr65wV3+G04uK
-bm+Sst3ZTzFmNe+8VRP39VsW89YIObPXhb/xhPlzjQaWLrd9T9TnOmMn3kIsR2sR
-s1ujMUdMIk/a7gnkNbmclyeD0pIj9A4PQYyt+Xm/+QKBgQCar5TCarOV93AemxPo
-1LcxAMBe6AKTkYtvzbAIaCgnNKV3hwq74dlO/m0In0mPumOk0/pjgXyr4jEoFbwg
-bDjpcVytgh4M9nE2hImmnEOWF1Mqnug09QRg1qhqLVpTjRB+fLNwxq0S84oz4wnQ
-jTFseK2f9Iwvn6t+AlDrB9rNyQ==
------END PRIVATE KEY-----`
+
 
 const baseUrl = "https://platypus.yazuishoudalu.com/"
 export const API = axios.create({
@@ -48,16 +20,14 @@ export const API = axios.create({
 
 const mockMessage = [{
   sender: 0,
-  message: `你好！我是钛月AI助手：基于与国外ChatGPT一样的gpt3.5训练的强大人工智能引擎开发。
-  我可以：写论文润色、角色扮演、知识百科、百度答题、作业解答分析、写代码等等...
+  message: `您好！我是钛月AI助手，是一款基于ChatGPT使用的gpt3.5引擎开发的智能聊天机器人。
 
-  你可以尝试输入问题：
-  [解释下量子计算机的原理]
-  [我要举办生日会，策划一个有趣的活动 ]
-  [写一篇广告策划方案]
-
-  如需更多免费消息次数：
-  “分享”框分享你的专属链接给1个新用户自动获得5条消息额`
+  我可以：论文润色、知识百科、百度答题、作业解答分析、写代码，角色扮演等等...  
+  
+  您可以尝试输入以下问题，看看我的能力: 
+  [解释下量子计算机的原理] 
+  [我要举办生日会，策划一个有趣的活动] 
+  [写一篇广告策划方案]`
 }];
 
 function useStateAndRef(initial) {
@@ -75,11 +45,10 @@ function App() {
   const [balance, setBalance] = useState();
   const [loading, setLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
+  const [payModalOpen, setPayModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
-  const [rechargeAmount, setRechargeAmount] = useState();
-  const [invitationCode, setInvitationCode] = useState();
-  const [shareInvitationUrl, setShareInvitationUrl] = useState('');
+
+  const [shareInvitationUrl, setShareInvitationUrl] = useState("");
 
   const [debugString, setDebugString] = useState('');
 
@@ -148,39 +117,6 @@ function App() {
     }
   }, [loadingText, loading])
 
-  const invokePaymentWindow = async (amount, invitationCode) => {
-    const params = {
-      "user_id": userId,
-      "amount": amount,
-      "invitation_code": invitationCode,
-    }
-    await axios.post(baseUrl + 'chat_proxy/wechat_jsapi_pay', params).then((response) => {
-      const responseData = response?.data?.data;
-      if (responseData) {
-        const { transaction_id, prepay_id } = responseData;
-        const checkPaymentParams = {
-          transaction_id: transaction_id,
-          invitation_code: invitationCode,
-        }
-        handlePay(prepay_id, checkPaymentParams);
-      }
-    }).catch(r => {
-      console.log(r)
-      message.warn("请联系公众号【钛月ai助手】");
-    });
-    setModalVisible(false);
-  }
-
-  const getPaymentStatus = async (checkPaymentParams) => {
-    await axios.post(baseUrl + 'chat_proxy/wechat_jsapi_query', checkPaymentParams).then((response) => {
-      if (response?.data.data) {
-        message.info('充值成功');
-      } else {
-        message.info(response)
-      }
-    }).catch(r => message.warn(r));
-  }
-
   const sendMessage = async (sendText) => {
     if (!userId) {
       message.warn('缺少用户信息，请重试');
@@ -214,13 +150,11 @@ function App() {
       } else if (response.data.data === 'no chat quota') {
         newMessageList.splice(-1, 1, {
           sender: 0,
-          message: `如需更多消息次数：
+          message: `如需更多消息次数：  
 
-          “分享”框复制分享你的专属链接给15个朋友自动获得7天免费会员
-          或
-          “分享”框复制分享你的专属链接给5个好友自动获得30条消息
-          或
-          购买18元包月高级无限制会员`
+          • 点击”分享”按钮，复制你的专属邀请链接，邀请一位新用户点击使用，即可获取5条消息奖励
+          
+          • 购买3元试用套餐或18元包月高级无限制会员`
         });
         setMessageList(newMessageList);
       } else if (response.data.data === 'sensitive words') {
@@ -238,52 +172,6 @@ function App() {
     setLoading(false);
   }
 
-  const handlePay = (prepay_id, checkPaymentParams) => {
-    if (typeof window.WeixinJSBridge == "undefined") {
-      if (document.addEventListener) {
-        document.addEventListener(
-          "WeixinJSBridgeReady",
-          onBridgeReady,
-          false
-        );
-      } else if (document.attachEvent) {
-        document.attachEvent("WeixinJSBridgeReady", onBridgeReady);
-        document.attachEvent("onWeixinJSBridgeReady", onBridgeReady);
-      }
-    } else {
-      onBridgeReady(prepay_id, checkPaymentParams);
-    }
-  }
-
-  const onBridgeReady = (prepay_id, checkPaymentParams) => {
-    const appId = "wxfc9591f30d5e5b0b";              //公众号ID，由商户传入  
-    const timeStamp = parseInt(+new Date() / 1000);   //时间戳，自1970年以来的秒数  
-    const nonceStr = Math.random().toString(36).slice(-10) + Math.random().toString(36).slice(-10);
-    const packageString = "prepay_id=" + prepay_id;
-    const sign = `${appId}\n${timeStamp}\n${nonceStr}\n${packageString}\n`
-    let encryptor = new JSEncrypt();
-    encryptor.setPrivateKey(PRIVATE_KEY);
-    const paySign = encryptor.sign(sign, CryptoJS.SHA256, "sha256");
-    window.WeixinJSBridge.invoke(
-      "getBrandWCPayRequest",
-      {
-        "appId": appId,
-        "timeStamp": timeStamp.toString(),
-        "nonceStr": nonceStr,      //随机串     
-        "package": packageString,
-        "signType": "RSA",     //微信签名方式：     
-        "paySign": paySign //微信签名 
-      },
-      function (res) {
-        if (res.err_msg === "get_brand_wcpay_request:ok") {
-          getPaymentStatus(checkPaymentParams);
-        } else {
-          console.log("fail");
-        }
-      }
-    );
-  }
-
   return (
     <div className="chat-room">
       {debugString !== "" && <div className='user-id' onClick={() => { }}>{debugString}</div>}
@@ -299,9 +187,7 @@ function App() {
           <BaseButton
             buttonText="充值"
             onClick={() => {
-              setModalVisible(true);
-              setRechargeAmount();
-              setInvitationCode();
+              setPayModalOpen(true);
             }}
             icon={<MoneyCollectOutlined style={{ color: 'gold' }} />}
           />
@@ -321,37 +207,14 @@ function App() {
             size="large"
             onChange={(v) => setInputText(v.target.value)}
             onPressEnter={() => sendMessage(inputText)}
-            suffix={(<Button icon={(<SendOutlined style={{ color: '#74c6b0', 'font-size': '20px' }} />)} onClick={() => sendMessage(inputText)} type="text" />)}
+            suffix={(<Button icon={(<SendOutlined style={{ color: '#74c6b0', fontSize: '20px' }} />)} onClick={() => sendMessage(inputText)} type="text" />)}
           />
           {/* <Button className='sent-button' type='primary' onClick={() => sendMessage(inputText)}>发送</Button> */}
         </div>
       </div>
-      <Modal
-        title="充值"
-        open={modalVisible}
-        onOk={() => {
-          if (rechargeAmount) {
-            invokePaymentWindow(rechargeAmount, invitationCode);
-          } else {
-            message.info('请至少选择一个金额');
-          }
-        }}
-        onCancel={() => { setModalVisible(false); setRechargeAmount(); }}
-        width="70%"
-        maskClosable={false}
-        closable={false}
-        cancelText="取消"
-        okText="确认"
-      >
-        <Button type={rechargeAmount === 3 ? "primary" : null} onClick={() => setRechargeAmount(3)}>3元(30条)</Button>
-        <Button type={rechargeAmount === 18 ? "primary" : null} onClick={() => setRechargeAmount(18)} style={{ "marginLeft": '5px' }}>18元(300条)</Button>
-        <Input
-          value={invitationCode}
-          onChange={(v) => setInvitationCode(v.target.value)}
-          placeholder="请输入邀请码（如有）"
-          style={{ "marginTop": '5px' }}>
-        </Input>
-      </Modal>
+
+      <PayModal payModalOpen={payModalOpen} userId={userId} setPayModalOpen={(open) => setPayModalOpen(open)}></PayModal>
+
       <ShareModal open={shareModalOpen}
         onCancel={() => { setShareModalOpen(false) }}
         shareInvitationUrl={shareInvitationUrl}>

@@ -11,3 +11,8 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.ant-modal-content {
+  overflow: auto;
+  border-radius: 20px;
+}
