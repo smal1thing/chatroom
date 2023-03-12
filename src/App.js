@@ -40,13 +40,14 @@ function useStateAndRef(initial) {
 function App() {
   const [messageList, setMessageList] = useState(mockMessage);
   const [inputText, setInputText] = useState('');
-  const [userId, setUserId] = useState('');
+  const [userId, setUserId] = useState('oVa5_59m5WCOAyckPoNqKEg-4Edo');
   const [userInvitationCode, setUserInvitationCode] = useState('');
   const [balance, setBalance] = useState();
   const [loading, setLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('');
   const [payModalOpen, setPayModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [chargeEnable, setChargeEnable] = useState(false);
 
   const [shareInvitationUrl, setShareInvitationUrl] = useState("");
 
@@ -156,6 +157,7 @@ function App() {
           
           • 购买3元试用套餐或18元包月高级无限制会员`
         });
+        setChargeEnable(true);
         setMessageList(newMessageList);
       } else if (response.data.data === 'sensitive words') {
         newMessageList.splice(-1, 1, {
@@ -184,13 +186,13 @@ function App() {
       </div>
       <div className='typing-part'>
         <div className="">
-          <BaseButton
+          {chargeEnable ? <BaseButton
             buttonText="充值"
             onClick={() => {
               setPayModalOpen(true);
             }}
             icon={<MoneyCollectOutlined style={{ color: 'gold' }} />}
-          />
+          /> : ''}
           <BaseButton
             buttonText="分享"
             onClick={() => {
