@@ -1,6 +1,6 @@
 
 import axios from "axios";
-import { SendOutlined, MoneyCollectOutlined, GiftOutlined } from '@ant-design/icons';
+import { SendOutlined, MoneyCollectOutlined, GiftOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useState, useEffect, useRef } from 'react';
 import { Input, Button, message, Modal } from 'antd';
 import { ShareModal } from './components/ShareModal'
@@ -40,7 +40,7 @@ function useStateAndRef(initial) {
 function App() {
   const [messageList, setMessageList] = useState(mockMessage);
   const [inputText, setInputText] = useState('');
-  const [userId, setUserId] = useState('oVa5_59m5WCOAyckPoNqKEg-4Edo');
+  const [userId, setUserId] = useState('');
   const [userInvitationCode, setUserInvitationCode] = useState('');
   const [balance, setBalance] = useState();
   const [loading, setLoading] = useState(false);
@@ -200,7 +200,12 @@ function App() {
             }}
             icon={<GiftOutlined style={{ color: 'red' }} />}
           />
-          {/* {userInvitationCode !== '' && <div className='balance'>您的邀请码: {userInvitationCode}</div>} */}
+          {userInvitationCode !== '' &&
+            <div className='balance'>
+              <InfoCircleOutlined style={{ color: 'blue', paddingRight: '5px' }} />
+              邀请码: {userInvitationCode}
+            </div>
+          }
         </div>
         <div className='typing-line'>
           <Input
@@ -221,7 +226,7 @@ function App() {
         onCancel={() => { setShareModalOpen(false) }}
         shareInvitationUrl={shareInvitationUrl}>
       </ShareModal>
-    </div>
+    </div >
   );
 }
 
