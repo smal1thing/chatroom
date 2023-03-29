@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Input, Button, message, Modal } from 'antd';
 import { ShareModal } from './components/ShareModal'
 import { PayModal } from "./components/PayModal";
+import { ActivityModal } from "./components/ActivityModal";
 import { MessageBox } from "./components/MessageBox";
 import 'antd/dist/antd.css';
 import './App.css';
@@ -226,6 +227,9 @@ function App() {
         onCancel={() => { setShareModalOpen(false) }}
         shareInvitationUrl={shareInvitationUrl}>
       </ShareModal>
+
+      <ActivityModal>
+      </ActivityModal>
     </div >
   );
 }
