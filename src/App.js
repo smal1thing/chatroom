@@ -228,7 +228,7 @@ function App() {
         shareInvitationUrl={shareInvitationUrl}>
       </ShareModal>
 
-      <ActivityModal>
+      <ActivityModal invitationCode={userInvitationCode}>
       </ActivityModal>
     </div >
   );
