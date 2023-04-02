@@ -217,8 +217,8 @@ function App() {
             onPressEnter={() => sendMessage(inputText)}
             suffix={(<Button icon={(<SendOutlined style={{ color: '#74c6b0', fontSize: '20px' }} />)} onClick={() => sendMessage(inputText)} type="text" />)}
           />
-          {/* <Button className='sent-button' type='primary' onClick={() => sendMessage(inputText)}>发送</Button> */}
         </div>
+        <a href="https://beian.miit.gov.cn/" className="footer">粤ICP备2021169555号-1</a >
       </div>
 
       <PayModal payModalOpen={payModalOpen} userId={userId} setPayModalOpen={(open) => setPayModalOpen(open)}></PayModal>

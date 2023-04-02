@@ -34,16 +34,17 @@ export function ShareModal(props) {
                     borderRadius: '10px',
                     border: 'none',
                     fontSize: '14px',
+                    color: 'white',
                     marginTop: '5px',
                     marginBottom: '5px',
                     marginLeft: '10px',
                     paddingLeft: '10px',
                     paddingRight: '10px',
-
+                    boxShadow: 'rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px',
                 }}>
                 一键复制
             </button>
-            <div style={{ fontSize: '12px' }}>{shareInvitationUrl}</div>
+            {/* <div style={{ fontSize: '12px' }}>{shareInvitationUrl}</div> */}
         </div>
         <div style={{ fontSize: '16px', marginBottom: '10px' }}>您也可以分享二维码：</div>
         <div style={{ marginLeft: '20px' }}>
@@ -51,7 +52,7 @@ export function ShareModal(props) {
         </div>
         <div style={{ border: '1px solid', marginTop: '10px', marginBottom: '10px' }} />
         <div style={{ fontSize: '14px', color: 'gray' }}>
-            <div><i className="fa-solid fa-circle-check"></i><span style={{ marginLeft: '4px' }}>分享链接，赢得提问机会！</span></div>
+            <div><i className="fa-solid fa-circle-check"></i><span style={{ marginLeft: '4px' }}>分享一个朋友，即可获得5条提问机会！</span></div>
             <div><i className="fa-solid fa-circle-check"></i><span style={{ marginLeft: '4px' }}>您只需将链接发送给朋友即可</span></div>
             <div><i className="fa-solid fa-circle-check"></i><span style={{ marginLeft: '4px' }}>详情请联系“钛月ai助手”公众号</span></div>
 

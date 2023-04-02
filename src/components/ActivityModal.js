@@ -33,7 +33,7 @@ export function ActivityModal(props) {
             完成本问卷可获得10条免费消息～<br />
             <br />
             您的邀请码： {invitationCode} <br />
-            问卷链接：<a href="https://www.wjx.cn/vm/euF9UEA.aspx">https://www.wjx.cn/vm/euF9UEA.aspx</a>
+            问卷链接：<a href="https://www.wjx.cn/vm/wOvHppL.aspx">https://www.wjx.cn/vm/wOvHppL.aspx</a>
         </div>
     </Modal >);
 
